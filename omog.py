@@ -101,8 +101,56 @@ def nurbs(vetorKnotCortado, numeroPontosCurva):
         
     return arrayEixoXNURBS, arrayEixoYNURBS
  
+def rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos):
+
+    last_cp_bspline = arrayDePontosNURBS[4]
+    first_cp_bezier = arrayDePontos[0]
+    deltaX = last_cp_bspline[0] - first_cp_bezier[0]
+    deltaY = last_cp_bspline[1] - first_cp_bezier[1]
+
+    for cp in arrayDePontos:
+        cp[0] = cp[0] + deltaX
+        cp[1] = cp[1] + deltaY
+
+    return arrayDePontos
 
 if __name__ == "__main__":
+
+    # NURBS Grau 4
+    arrayEixoXNURBS = []
+    arrayEixoYNURBS = []
+
+    # Definição do número de pontos de controle para NURBS
+    numeroPontosDeControleNURBS = 5
+
+    # Seleção do usuário por click dos pontos para formação da curva NURBS
+    plt.title("NURBS - Clique em 5 (cinco) pontos")
+
+    # Obtém a array de pontos selecionados pelo usuário
+    arrayDePontosNURBS = np.array(plt.ginput(numeroPontosDeControleNURBS))
+    
+    # Divide a array em eixo X e eixo Y
+    arrayEixoXNURBSPontos = arrayDePontosNURBS[:,0]
+    arrayEixoYNURBSPontos = arrayDePontosNURBS[:,1]
+
+    # Grau da NURBS
+    pNURBS = 4
+
+    vetorKnot = getKnotsVetor(arrayDePontosNURBS, pNURBS)
+    vetorKnotCortado = [vetorKnot[j] for j in range(pNURBS, len(vetorKnot) - pNURBS)]
+
+    arrayEixoXNURBS, arrayEixoYNURBS = nurbs(vetorKnotCortado, 1000)
+
+    # Fecho o plot de seleção dos pontos para abrir outro com a curva
+    plt.close()
+
+    # Plot da curva na tela - NURBS
+    plt.figure(figsize=(8, 6), dpi=80)
+    plt.xlim(right=2)
+    plt.ylim(top=2)
+    plt.plot(arrayEixoXNURBS, arrayEixoYNURBS, color = 'green')
+    plt.plot(arrayEixoXNURBSPontos, arrayEixoYNURBSPontos, 'o', color = 'yellow')
+
     # Definição do número de pontos de controle para a Bezier. Como minha curva é de grau 3, defini 4 pontos.
     numeroPontosDeControle = 4
 
@@ -120,50 +168,18 @@ if __name__ == "__main__":
     # Obs.: o número de pontos na curva a torna proporcionalmente sinuosa (+ pontos + contínua; - pontos + quebrada)
     arrayCurvaBezEixoX, arrayCurvaBezEixoY = bezier(arrayDePontos, 1000)
 
-    # Fecho o plot de seleção dos pontos para abrir outro com a curva
-    plt.close()
-
-    # Plot da curva na tela - Bezier
-    plt.figure(figsize=(8, 6), dpi=80)
-    plt.xlim(right=2)
-    plt.ylim(top=2)
-    plt.plot(arrayCurvaBezEixoX, arrayCurvaBezEixoY, color = 'blue')
-    plt.plot(arrayEixoX, arrayEixoY, 'o', color = 'red')
-
-    # NURBS Grau 4
-
-    arrayEixoXNURBS = []
-    arrayEixoYNURBS = []
-
-    # Definição do número de pontos de controle para NURBS
-    numeroPontosDeControleNURBS = 5
-
-    # Seleção do usuário por click dos pontos para formação da curva NURBS
-    plt.title("NURBS - Clique em 5 (cinco) pontos")
-
-    # Obtém a array de pontos selecionados pelo usuário
-    arrayDePontosNURBS = np.array(plt.ginput(numeroPontosDeControleNURBS))
-
     # Obtendo continuidade C0: os pontos de controle finais da Bezier são o começo da NURBS
-    arrayDePontosNURBS[0][0] = arrayEixoX[3]
-    arrayDePontosNURBS[0][1] = arrayEixoY[3]
-    
-    # Divide a array em eixo X e eixo Y
-    arrayEixoXNURBSPontos = arrayDePontosNURBS[:,0]
-    arrayEixoYNURBSPontos = arrayDePontosNURBS[:,1]
-
-    # Grau da NURBS
-    pNURBS = 4
-
-    vetorKnot = getKnotsVetor(arrayDePontosNURBS, pNURBS)
-    vetorKnotCortado = [vetorKnot[j] for j in range(pNURBS, len(vetorKnot) - pNURBS)]
-    
-    arrayEixoXNURBS, arrayEixoYNURBS = nurbs(vetorKnotCortado, 1000)
+    arrayDePontos = rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos)
    
+    arrayCurvaBezEixoX, arrayCurvaBezEixoY = bezier(arrayDePontos, 1000)
+
+    # Divide a array em eixo X e eixo Y
+    arrayEixoX = arrayDePontos[:,0]
+    arrayEixoY = arrayDePontos[:,1]
+
     # Fecho o plot para gerar as curvas com continuidade C0
     plt.close()
 
-    # Plot da curva na tela - NURBS
     plt.plot(arrayEixoXNURBS, arrayEixoYNURBS, color = 'green')
     plt.plot(arrayEixoXNURBSPontos, arrayEixoYNURBSPontos, 'o', color = 'yellow')
     plt.plot(arrayCurvaBezEixoX, arrayCurvaBezEixoY, color = 'blue')
