@@ -103,14 +103,14 @@ def nurbs(vetorKnotCortado, numeroPontosCurva):
  
 def rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos):
 
-    last_cp_bspline = arrayDePontosNURBS[4]
-    first_cp_bezier = arrayDePontos[0]
-    deltaX = last_cp_bspline[0] - first_cp_bezier[0]
-    deltaY = last_cp_bspline[1] - first_cp_bezier[1]
+    ultimoPontoNURBS = arrayDePontosNURBS[4]
+    primeiroPontoBezier = arrayDePontos[0]
+    deltaX = ultimoPontoNURBS[0] - primeiroPontoBezier[0]
+    deltaY = ultimoPontoNURBS[1] - primeiroPontoBezier[1]
 
-    for cp in arrayDePontos:
-        cp[0] = cp[0] + deltaX
-        cp[1] = cp[1] + deltaY
+    for ponto in arrayDePontos:
+        ponto[0] = ponto[0] + deltaX
+        ponto[1] = ponto[1] + deltaY
 
     return arrayDePontos
 
