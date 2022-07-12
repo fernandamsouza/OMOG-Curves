@@ -1,5 +1,11 @@
+import math
+import sys
 import numpy as np
 from matplotlib import pyplot as plt
+import sympy as sp
+import scipy.special
+
+v = sp.symbols('v')
 
 def bezier(arrayDePontos, numeroPontosCurva):
     grauDaBezier = len(arrayDePontos) - 1
@@ -112,7 +118,47 @@ def rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos):
         ponto[0] = ponto[0] + deltaX
         ponto[1] = ponto[1] + deltaY
 
+    # C1 
+    penultimoNURBS = arrayDePontosNURBS[3]
+    penultimoBEZIER = arrayDePontos[0]
+
+    deltaXC1 = penultimoNURBS[0] - penultimoBEZIER[0]
+    deltaYC1 = penultimoNURBS[1] - penultimoBEZIER[1]
+    
+    arrayDePontos[1][0] = penultimoBEZIER[0] - deltaXC1
+    arrayDePontos[1][1] = penultimoBEZIER[1] - deltaYC1
+
     return arrayDePontos
+
+def b (i, numeroPontos):
+    return scipy.special.binom(numeroPontos - 1, i) * (v ** i) * ((1 - v) ** (numeroPontos - i - 1))
+
+def c1 (arrayDePontos):
+    numeroPontos = len(arrayDePontos)
+    binomio = [b(i, numeroPontos) for i in range(numeroPontos)]
+    inicializacao = np.linspace(0, 1, 1000)
+
+    bezierXC1 = []
+    bezierYC1 = []
+    tuplaFinal = []
+
+    xf = 0
+    yf = 0
+
+    for i in range(numeroPontos):
+        xf += arrayDePontos[i][0] * binomio[i]
+        yf += arrayDePontos[i][1] * binomio[i]
+    
+    for j in inicializacao:
+        x = xf.subs(v, j)
+        y = yf.subs(v, j)
+
+        bezierXC1.append(x)
+        bezierYC1.append(y)
+         
+        tuplaFinal.append([x,y])
+
+    return tuplaFinal, bezierXC1, bezierYC1, xf
 
 if __name__ == "__main__":
 
@@ -146,8 +192,8 @@ if __name__ == "__main__":
 
     # Plot da curva na tela - NURBS
     plt.figure(figsize=(8, 6), dpi=80)
-    plt.xlim(right=2)
-    plt.ylim(top=2)
+    plt.xlim(right=1)
+    plt.ylim(top=1)
     plt.plot(arrayEixoXNURBS, arrayEixoYNURBS, color = 'green')
     plt.plot(arrayEixoXNURBSPontos, arrayEixoYNURBSPontos, 'o', color = 'yellow')
 
@@ -168,9 +214,9 @@ if __name__ == "__main__":
     # Obs.: o número de pontos na curva a torna proporcionalmente sinuosa (+ pontos + contínua; - pontos + quebrada)
     arrayCurvaBezEixoX, arrayCurvaBezEixoY = bezier(arrayDePontos, 1000)
 
-    # Obtendo continuidade C0: os pontos de controle finais da Bezier são o começo da NURBS
+    # Obtendo continuidade C0 e C1
     arrayDePontos = rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos)
-   
+
     arrayCurvaBezEixoX, arrayCurvaBezEixoY = bezier(arrayDePontos, 1000)
 
     # Divide a array em eixo X e eixo Y
