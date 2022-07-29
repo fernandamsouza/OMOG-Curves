@@ -1,5 +1,6 @@
 import math
 import sys
+from turtle import down, left
 import numpy as np
 from matplotlib import pyplot as plt
 import sympy as sp
@@ -109,6 +110,7 @@ def nurbs(vetorKnotCortado, numeroPontosCurva):
  
 def rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos):
 
+    # C0
     ultimoPontoNURBS = arrayDePontosNURBS[4]
     primeiroPontoBezier = arrayDePontos[0]
     deltaX = ultimoPontoNURBS[0] - primeiroPontoBezier[0]
@@ -118,15 +120,31 @@ def rotacionarBezierNurbs(arrayDePontosNURBS, arrayDePontos):
         ponto[0] = ponto[0] + deltaX
         ponto[1] = ponto[1] + deltaY
 
-    # C1 
+    # G1
     penultimoNURBS = arrayDePontosNURBS[3]
-    penultimoBEZIER = arrayDePontos[0]
+    primeiroBEZIER = arrayDePontos[0]
 
-    deltaXC1 = penultimoNURBS[0] - penultimoBEZIER[0]
-    deltaYC1 = penultimoNURBS[1] - penultimoBEZIER[1]
+    deltaXC1 = penultimoNURBS[0] - primeiroBEZIER[0]
+    deltaYC1 = penultimoNURBS[1] - primeiroBEZIER[1]
     
-    arrayDePontos[1][0] = penultimoBEZIER[0] - deltaXC1
-    arrayDePontos[1][1] = penultimoBEZIER[1] - deltaYC1
+    arrayDePontos[1][0] = primeiroBEZIER[0] - deltaXC1
+    arrayDePontos[1][1] = primeiroBEZIER[1] - deltaYC1
+
+    # G2
+    antiPenultimoNURBS = arrayDePontosNURBS[2]
+    primeiroBEZIER = arrayDePontos[0]
+
+    deltaXC1 = antiPenultimoNURBS[0] - primeiroBEZIER[0]
+    deltaYC1 = antiPenultimoNURBS[1] - primeiroBEZIER[1]
+    
+    arrayDePontos[2][0] = primeiroBEZIER[0] - deltaXC1
+    arrayDePontos[2][1] = primeiroBEZIER[1] - deltaYC1
+
+    # deltaX = arrayDePontosNURBS[2][0] - arrayDePontosNURBS[1][0]
+    # deltaY = arrayDePontosNURBS[2][1] - arrayDePontosNURBS[1][1]
+    # seclast_pos = arrayDePontos[-2]
+
+    # arrayDePontos[-3] = seclast_pos[0] - deltaX, seclast_pos[1] - deltaY
 
     return arrayDePontos
 
@@ -230,5 +248,5 @@ if __name__ == "__main__":
     plt.plot(arrayEixoXNURBSPontos, arrayEixoYNURBSPontos, 'o', color = 'yellow')
     plt.plot(arrayCurvaBezEixoX, arrayCurvaBezEixoY, color = 'blue')
     plt.plot(arrayEixoX, arrayEixoY, 'o', color = 'red')
-    plt.title("Bezier Grau 3 + Nurbs Grau 4 - C0 - Fernanda Maria de Souza")
+    plt.title("Bezier Grau 3 + Nurbs Grau 4 - G2 - Fernanda Maria de Souza")
     plt.show()
